@@ -2,30 +2,18 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ],
-      "dotEnv": [
-        ".env.local",
-        ".env"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "dotEnv": [".env.local", ".env"]
     },
     "lint": {
-      "dependsOn": [
-        "^lint"
-      ]
+      "dependsOn": ["^lint"]
     },
     "dev": {
       "cache": false,
       "persistent": true,
-      "dotEnv": [
-        ".env.local",
-        ".env"
-      ]
+      "dotEnv": [".env.local", ".env"]
     }
-  }
+  },
+  "globalEnv": ["NEXT_PUBLIC_APP_NAME", "NEXT_PUBLIC_DEPLOYMENT_ENV"]
 }
