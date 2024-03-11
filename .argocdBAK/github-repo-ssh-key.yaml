@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-repo-ssh-key
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  sshPrivateKey:
+    # Created with command
+    # kubectl create secret generic github-repo-ssh-key --from-file=sshPrivateKey=/Users/ronan/.ssh/id_ed25519 --namespace nextjs-app
+    name: github-repo-ssh-key
+    key: sshPrivateKey
+  sshAuthSock: /tmp/ssh-agent.sock

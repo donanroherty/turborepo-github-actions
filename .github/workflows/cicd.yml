@@ -1,0 +1,71 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  setup_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup and Test
+        uses: ./.github/actions/setup-and-test
+        with:
+          node-version: '20.x'
+
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Extract details for PRs and Main branch
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+        run: |
+          echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})" >> $GITHUB_ENV
+          echo "SHORT_SHA=$(echo ${GITHUB_SHA::8})" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and Push Docker image for PR or Main branch
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./DOCKERFILE.web
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/turborepo-github-actions/site:pr-${{ env.BRANCH_NAME }}-${{ env.SHORT_SHA }}
+          build-args: |
+            VERSION=pr-${{ env.BRANCH_NAME }}-${{ env.SHORT_SHA }}
+
+      - name: Build and Push Docker image for Tags
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./DOCKERFILE.web
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/turborepo-github-actions/site:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/turborepo-github-actions/site:latest
+          build-args: |
+            VERSION=${{ env.VERSION }}
