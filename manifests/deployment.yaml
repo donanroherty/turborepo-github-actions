@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: turborepo-github-actons
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: turborepo-github-actons
+  template:
+    metadata:
+      labels:
+        app: turborepo-github-actons
+    spec:
+      containers:
+      - name: turborepo-github-actons
+        image: turborepo-github-actons:latest
+        ports:
+        - containerPort: 3000

@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: turborepo-github-actions
+spec:
+  source:
+    repoURL: https://github.com/donanroherty/turborepo-github-actions.git
+    targetRevision: HEAD
+    path: .
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  imagePullSecrets:
+  - name: github-registry-credentials
