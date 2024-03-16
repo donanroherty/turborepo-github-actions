@@ -1,0 +1,42 @@
+name: Release Deployment
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup and Test
+        uses: ./.github/actions/setup-and-test
+        with:
+          node-version: '16.x'
+      
+      - name: Extract version from tag
+        run: echo "VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and Push Docker image for Tags
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./DOCKERFILE.web
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/turborepo-github-actions/site:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/turborepo-github-actions/site:latest
+          build-args: VERSION=${{ env.VERSION }}

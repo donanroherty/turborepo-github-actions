@@ -1,0 +1,17 @@
+name: Blue/Green Deployment
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/bluegreen.yaml'
+
+jobs:
+  deploy:
+    steps:
+      - name: Checkout code
+      uses: actions/checkout@v3
+
+    

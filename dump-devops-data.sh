@@ -15,3 +15,12 @@ for file in kubernetes/*.yaml; do
     cat "$file" >> output.txt
     echo >> output.txt
 done
+
+echo "Github workflow YAML files:" > output.txt
+echo "---" >> output.txt
+for file in .github/workflows/*.yaml; do
+    echo "File: $file" >> output.txt
+    echo "---" >> output.txt
+    cat "$file" >> output.txt
+    echo >> output.txt
+done
