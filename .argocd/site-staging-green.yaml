@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: nextjs-app
+  name: site-staging-green
   namespace: argocd
 spec:
   project: nextjs-project
   source:
     repoURL: https://github.com/donanroherty/turborepo-github-actions.git
     targetRevision: main
-    path: kubernetes
+    path: kubernetes/overlays/green
     kustomize:
       images:
-      - ghcr.io/donanroherty/turborepo-github-actions/site:latest
+      - ghcr.io/donanroherty/turborepo-github-actions/site:staging
   destination:
     server: https://kubernetes.default.svc
     namespace: nextjs-app

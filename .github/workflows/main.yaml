@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true # Cancel any previous runs in progress
+
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
