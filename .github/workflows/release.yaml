@@ -20,6 +20,9 @@ jobs:
       - name: Extract version from tag
         run: echo "VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
 
+      - name: Get the current date
+        run: echo "CURRENT_DATE=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -37,6 +40,7 @@ jobs:
           file: ./DOCKERFILE.web
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/turborepo-github-actions/site:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/turborepo-github-actions/site:release-${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/turborepo-github-actions/site:release-${{ env.CURRENT_DATE }}
             ghcr.io/${{ github.repository_owner }}/turborepo-github-actions/site:latest
           build-args: VERSION=${{ env.VERSION }}
